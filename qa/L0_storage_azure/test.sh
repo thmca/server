@@ -229,10 +229,14 @@ if [ "$SERVER_PID" == "0" ]; then
 fi
 
 set +e
+echo -e "Config:"
+cat savedmodel_float32_float32_float32/config.pbtxt
 $PERF_CLIENT -m savedmodel_float32_float32_float32 -p 3000 -t 1 >$CLIENT_LOG 2>&1
 if [ $? -ne 0 ]; then
     echo -e "\n***\n*** Test Failed\n***"
     cat $CLIENT_LOG
+    echo -e "Server log: "
+    cat $SERVER_LOG
     RET=1
 fi
 set -e
