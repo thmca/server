@@ -113,6 +113,17 @@ if [ $? -ne 0 ]; then
 fi
 
 # PyTorch
+if [[ "${TRITON_VERSION}" < "22.09" ]] ; 
+then 
+cat >$HOST_SRCDIR/$PYTSCRIPT <<EOF
+#!/bin/bash -x
+nvidia-smi -L || true
+set -e
+python3 $SRCDIR/gen_qa_custom_ops_models.py --libtorch --models_dir=$DESTDIR
+cp /root/.cache/torch_extensions/py38_cu117/custom_modulo/custom_modulo.so $DESTDIR/libtorch_modulo/.
+chmod -R 777 $DESTDIR
+EOF
+else 
 cat >$HOST_SRCDIR/$PYTSCRIPT <<EOF
 #!/bin/bash -x
 nvidia-smi -L || true
@@ -121,6 +132,7 @@ python3 $SRCDIR/gen_qa_custom_ops_models.py --libtorch --models_dir=$DESTDIR
 cp /root/.cache/torch_extensions/py38_cu118/custom_modulo/custom_modulo.so $DESTDIR/libtorch_modulo/.
 chmod -R 777 $DESTDIR
 EOF
+fi
 
 chmod a+x $HOST_SRCDIR/$PYTSCRIPT
 if [ $? -ne 0 ]; then
